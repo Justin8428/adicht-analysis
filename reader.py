@@ -22,13 +22,14 @@ def progressBar(current, total, barLength = 20): # copied from https://stackover
 def main_generate_csv(filename, folder = ""):
     f = adi.read_file(filename)
     final_list = []
+    print(f'Computing for {filename}...')
+
     # my files here have a poll rate of 1000 Hz. so index is 1 ms
     # f.channels
     for record_id in range(1, f.n_records):
         channel_id = 1
         # print(record_id)
         # record_id = 2
-        print(f'Computing for {filename}...')
         progressBar(record_id, f.n_records+1)
         data = f.channels[channel_id-1].get_data(record_id)
         
