@@ -9,7 +9,7 @@ This script requires the adinstruments SDK driver available here: https://github
  - Store your adicht files in a subdirectory e.g. "./myfiles"
  - Run the command `py reader.py -i "./myfiles" -o "results.csv"`
 
-For the assignment I just used the commands
+For the PHSI3012 assignment I just used the commands
 `py reader.py -i "./drugs" -o "drug_results.csv"`
 `py reader.py -i "./calcium" -o "calcium_results.csv"`
 
