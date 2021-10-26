@@ -15,5 +15,5 @@ For the PHSI3012 assignment I just used the commands
 `py reader.py -i "./drugs" -o "drug_results.csv"`
 `py reader.py -i "./calcium" -o "calcium_results.csv"`
 
-## analysis.Rmd
-R markdown file containing statistical analysis of the data.
+## .Rmd files
+These are the R markdown files containing statistical analysis of the data.
