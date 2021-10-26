@@ -1,0 +1,108 @@
+---
+title: "calcium_analysis"
+author: "justin"
+date: "23/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+# Calcium
+
+```{r}
+ccaldf = readxl::read_excel("calcium_results_modified_percent.xlsx")
+
+ccaldf$drug_type = factor(ccaldf$drug_type)
+ccaldf$exp_state = factor(ccaldf$exp_state, levels = c('control', 'exp', 'washout'))
+ccaldf = ccaldf %>%
+  filter(exp_state == "exp") %>%
+  select(record_id, drug_type, starts_with("delta_"), time_since_stim_sec)
+ccaldf
+```
+
+```{r}
+ccaldf %>%
+  filter(time_since_stim_sec <= 600) %>%
+  mutate(drug_type = case_when(
+  drug_type == "high_calcium" ~ "High Ca2+",
+  drug_type == "no_calcium" ~ "No Ca2+"
+  )) %>%
+  ggplot() +
+  aes(x = time_since_stim_sec, y = delta_peak_tension, colour = drug_type) + 
+  geom_point()+
+  geom_smooth(method = "lm", fill = NA) + 
+  theme_bw() + 
+  labs(x = "Time since changing calcium (s)", y = "Relative peak tension (%)", colour = "Calcium Level")
+```
+
+```{r}
+Mcalcium = ccaldf %>%
+  filter(time_since_stim_sec <= 600) %>%
+  lmList(delta_peak_tension ~ time_since_stim_sec | drug_type, data = .)
+Sigma=summary(Mcalcium)$sigma
+pval = summary(Mcalcium)$coefficients
+pval
+cbind(coef(Mcalcium),Sigma)
+```
+
+
+```{r}
+ccaldf %>%
+  filter(time_since_stim_sec <= 600) %>%
+  filter(drug_type == "high_calcium") %>%
+  lm(delta_peak_tension ~ time_since_stim_sec, data = .) %>%
+  summary()
+
+
+ccaldf %>%
+  filter(time_since_stim_sec <= 600) %>%
+  filter(drug_type == "no_calcium") %>%
+  lm(delta_peak_tension ~ time_since_stim_sec, data = .) %>%
+  summary()
+```
+
+
+
+```{r}
+ccaldf %>%
+  group_by(drug_type) %>%
+  summarise(meanPT = mean(delta_peak_tension), count = n())
+```
+
+
+```{r}
+#xaxislabels = c("High Ca2+", "Low Ca2+")
+ccaldf %>%
+  mutate(drug_type = case_when(
+    drug_type == "high_calcium" ~ "High Ca2+",
+    drug_type == "no_calcium" ~ "No Ca2+"
+  )) %>%
+  ggplot() +
+  aes(x = drug_type, y = delta_peak_tension, colour = drug_type) + 
+  geom_boxplot() + 
+  theme_bw() +
+  labs(xaxislabels, x = "Calcium Level", y = "Mean relative peak tension (%)")
+
+ccaldf %>%
+  ggplot() +
+  aes(x = drug_type, y = delta_ttp, colour = drug_type) + 
+  geom_boxplot()
+
+ccaldf %>%
+  ggplot() +
+  aes(x = drug_type, y = delta_thalf, colour = drug_type) + 
+  geom_boxplot()
+```
+
+```{r}
+t.test(delta_peak_tension ~ drug_type, data = ccaldf)
+t.test(delta_ttp ~ drug_type, data = ccaldf)
+t.test(delta_thalf ~ drug_type, data = ccaldf)
+
+```
+
+
+
+
